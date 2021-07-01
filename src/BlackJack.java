@@ -5,9 +5,26 @@ import java.util.List;
 import java.util.Scanner;
 
 public class BlackJack {
-    private static final Scanner STDIN = new Scanner(System.in);
+    private static final String MESSAGE_FOR_PAY_BACK_AT_DRAW = "[引き分け] %d の払い戻し %n";
+    private static final String MESSAGE_FOR_PAY_BACK_AT_WIN = "[勝ち] %d の払い戻し %n";
+    private static final String MESSAGE_FOR_PAY_BACK_AT_BLACK_JACK = "[BLACK JACK] %d の払い戻し %n";
+    private static final String MESSAGE_FOR_DRAWN_CARD_FACE_UP = "%s に「%s」が配られました。 %n";
+    private static final String MESSAGE_FOR_DRAWN_CARD_FACE_DOWN = "%s に「？」が配られました。 %n";
+    private static final String MESSAGE_FOR_LOSE = "あなたの負けです";
+    private static final String MESSAGE_FOR_DRAW = "引き分けです";
+    private static final String MESSAGE_FOR_BLACK_JACK = "Black Jack です";
+    private static final String MESSAGE_FOR_WIN = "あなたの勝ちです";
+    private static final String MESSAGE_FOR_COIN_AMOUNT = "[所持コイン] %d %n%n";
+    private static final String MESSAGE_FOR_ACTION_BET = "%d コインを賭けた %n";
+    private static final String MESSAGE_FOR_VALUE_OF_DEALER = "ディーラーの合計は %d です。 %n";
+    private static final String MESSAGE_FOR_VALUE_OF_PLAYER = "現在の合計は %d です。 %n";
+    private static final String MESSAGE_FOR_REQUIRED_HIT_OR_STAND = "もう１枚カードを引きますか？(Y/N): ";
+    private static final String MESSAGE_FOR_INVALID_INPUT = "Y か N で回答してください。";
+    private static final String MESSAGE_FOR_BUSTED = "バーストしました";
 
-    private static final boolean IS_DEBUG_MODE = true;
+    private static final String ROUND_START_LINE = "■ ラウンド %d : ---------------------------------- %n";
+
+    private static final Scanner STDIN = new Scanner(System.in);
 
     private static final int NUM_OF_PLAYERS = 2;
     private static final int NUM_OF_CARDS_AT_FIRST = 2;
@@ -19,8 +36,7 @@ public class BlackJack {
 
     private static final String[] SUIT_TYPES = { "スペード", "ダイヤ", "クラブ", "ハート", };
 
-    private static final String[] RANK_TYPES = { "A", "2", "3", "4", "5", "6",
-            "7", "8", "9", "10", "J", "Q", "K", };
+    private static final String[] RANK_TYPES = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", };
 
     private static final int FACE_CARD_VALUE = 10;
     private static final int ACE_CARD_AS_SMALL_VALUE = 1;
@@ -43,12 +59,13 @@ public class BlackJack {
         initDeck(deck);
         shuffleDeck(deck);
 
-        game(deck, coins);
+        int round = 0;
+        game(deck, coins, round);
     }
 
-    private static void game(List<String> deck, int coins) {
+    private static void game(List<String> deck, int coins, int round) {
 
-        System.out.println("----------------------------------");
+        showRoundStartLine(++round);
         coins = bet(coins);
         showCoinAmount(coins);
 
@@ -63,58 +80,62 @@ public class BlackJack {
             if (isBlackJack(playerHand)) {
                 coins += AMOUNT_OF_COIN_BACK_AT_BLACK_JACK;
 
-                System.out.format("[BLACK JACK] %d の払い戻し %n",
-                        AMOUNT_OF_COIN_BACK_AT_BLACK_JACK);
+                System.out.format(MESSAGE_FOR_PAY_BACK_AT_BLACK_JACK, AMOUNT_OF_COIN_BACK_AT_BLACK_JACK);
 
                 showMessageBlackJack();
                 showCoinAmount(coins);
             } else {
                 coins += AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN;
 
-                System.out.format("[勝ち] %d の払い戻し %n",
-                        AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN);
+                System.out.format(MESSAGE_FOR_PAY_BACK_AT_WIN, AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN);
 
                 showCoinAmount(coins);
             }
             showMessageWin();
-            game(deck, coins);
+            
+            game(deck, coins, round);
+            return;
         }
 
         if (isDraw(eachHands)) {
             coins += AMOUNT_OF_COIN_BACK_AT_DRAW;
-            System.out.format("[引き分け] %d の払い戻し %n",
-                    AMOUNT_OF_COIN_BACK_AT_DRAW);
+            System.out.format(MESSAGE_FOR_PAY_BACK_AT_DRAW, AMOUNT_OF_COIN_BACK_AT_DRAW);
 
             showMessageDraw();
             showCoinAmount(coins);
-            game(deck, coins);
+            
+            game(deck, coins, round);
+            return;
         }
 
         showMessageLose();
 
-        showPlayerHands(eachHands, IS_DEBUG_MODE);
-        showDealerHands(eachHands, IS_DEBUG_MODE);
-
         if (hasCoin(coins)) {
             showCoinAmount(coins);
-            game(deck, coins);
+            
+            game(deck, coins, round);
+            return;
         }
     }
 
+    private static void showRoundStartLine(int round) {
+        System.out.format(ROUND_START_LINE, round);
+    }
+
     private static void showMessageWin() {
-        System.out.println("あなたの勝ちです");
+        System.out.println(MESSAGE_FOR_WIN);
     }
 
     private static void showMessageBlackJack() {
-        System.out.println("Black Jack です");
+        System.out.println(MESSAGE_FOR_BLACK_JACK);
     }
 
     private static void showMessageDraw() {
-        System.out.println("引き分けです");
+        System.out.println(MESSAGE_FOR_DRAW);
     }
 
     private static void showMessageLose() {
-        System.out.println("あなたの負けです");
+        System.out.println(MESSAGE_FOR_LOSE);
     }
 
     private static boolean hasCoin(int coins) {
@@ -122,15 +143,14 @@ public class BlackJack {
     }
 
     private static void showCoinAmount(int coins) {
-        System.out.format("コイン=%d %n", coins);
+        System.out.format(MESSAGE_FOR_COIN_AMOUNT, coins);
     }
 
     private static boolean isDraw(List<List<String>> eachHands) {
         List<String> playerHand = eachHands.get(PLAYER_INDX);
         List<String> dealerHand = eachHands.get(DEALER_INDX);
 
-        return calcValue(playerHand) == calcValue(dealerHand)
-                || (isBusted(playerHand) && isBusted(dealerHand));
+        return calcValue(playerHand) == calcValue(dealerHand) || (isBusted(playerHand) && isBusted(dealerHand));
     }
 
     private static boolean isBlackJack(List<String> hand) {
@@ -143,13 +163,12 @@ public class BlackJack {
     }
 
     private static void showMessageActionBet(int amount) {
-        System.out.format("%d コインを賭けた %n", amount);
+        System.out.format(MESSAGE_FOR_ACTION_BET, amount);
     }
 
     private static boolean isWinPlayer(List<List<String>> eachHands) {
         List<String> playerHand = eachHands.get(PLAYER_INDX);
-        return (isMoreThanDealerValue(eachHands) && !isBusted(playerHand))
-                || isOnlyDealerBusted(eachHands);
+        return (isMoreThanDealerValue(eachHands) && !isBusted(playerHand)) || isOnlyDealerBusted(eachHands);
     }
 
     private static boolean isOnlyDealerBusted(List<List<String>> eachHands) {
@@ -176,55 +195,26 @@ public class BlackJack {
         return eachHands;
     }
 
-    private static void showPlayerHands(List<List<String>> eachHands,
-            boolean isDebug) {
-
-        if (!isDebug) {
-            return;
-        }
-
-        int count = 1;
-        for (String hand : eachHands.get(PLAYER_INDX)) {
-            System.out.format("[DEBUG] Player%d=%s %n", count++, hand);
-        }
-    }
-
-    private static void showDealerHands(List<List<String>> eachHands,
-            boolean isDebug) {
-
-        if (!isDebug) {
-            return;
-        }
-
-        int count = 1;
-        for (String hand : eachHands.get(DEALER_INDX)) {
-            System.out.format("[DEBUG] Dealer%d=%s %n", count++, hand);
-        }
-    }
-
-    private static void oparateByPlayer(List<String> deck,
-            List<List<String>> eachHands) {
+    private static void oparateByPlayer(List<String> deck, List<List<String>> eachHands) {
 
         List<String> playerHand = eachHands.get(PLAYER_INDX);
 
         actHitOrStandByPlayer(deck, playerHand);
     }
 
-    private static void operateByDealer(List<String> deck,
-            List<List<String>> eachHands) {
+    private static void operateByDealer(List<String> deck, List<List<String>> eachHands) {
 
         List<String> hand = eachHands.get(DEALER_INDX);
         actHitOrStandByDealer(deck, hand);
 
     }
 
-    private static void actHitOrStandByDealer(List<String> deck,
-            List<String> hand) {
+    private static void actHitOrStandByDealer(List<String> deck, List<String> hand) {
 
         boolean isDealt = false;
         while (!isValueOverDealerLimit(hand)) {
             draw(deck, hand);
-            showDrawnCard(NAMES[DEALER_INDX], hand);
+            showDrawnCardFaceUp(NAMES[DEALER_INDX], hand);
             showValueOfDealer(hand);
             println();
             isDealt = true;
@@ -240,15 +230,18 @@ public class BlackJack {
         return calcValue(hand) >= DEALER_LIMIT_VALUE;
     }
 
-    private static void actHitOrStandByPlayer(List<String> deck,
-            List<String> hand) {
+    private static void actHitOrStandByPlayer(List<String> deck, List<String> hand) {
+
+        if (isBlackJack(hand)) {
+            return;
+        }
 
         showValueOfPlayer(hand);
         String inputtedUserAnswer = requireHitOrStand();
 
         while (isChooseActionHit(inputtedUserAnswer)) {
             draw(deck, hand);
-            showDrawnCard(NAMES[PLAYER_INDX], hand);
+            showDrawnCardFaceUp(NAMES[PLAYER_INDX], hand);
 
             showValueOfPlayer(hand);
             println();
@@ -267,7 +260,7 @@ public class BlackJack {
     }
 
     private static void showMessageBusted() {
-        System.out.println("バーストしました");
+        System.out.println(MESSAGE_FOR_BUSTED);
     }
 
     private static String recieveInputtedYorN() {
@@ -275,14 +268,14 @@ public class BlackJack {
 
         if (!isCorrectActionInRange(inputtedStr)) {
             showMessageInvalidInput();
-            requireHitOrStand();
-            return recieveInputtedYorN();
+
+            return requireHitOrStand();
         }
         return inputtedStr;
     }
 
     private static void showMessageInvalidInput() {
-        System.out.println("Y か N で回答してください。");
+        System.out.println(MESSAGE_FOR_INVALID_INPUT);
     }
 
     private static boolean isCorrectActionInRange(String str) {
@@ -310,17 +303,17 @@ public class BlackJack {
     }
 
     private static void showMessageRequireHitOrStand() {
-        System.out.print("もう１枚カードを引きますか？(Y/N): ");
+        System.out.print(MESSAGE_FOR_REQUIRED_HIT_OR_STAND);
     }
 
     private static void showValueOfPlayer(List<String> hand) {
         int value = calcValue(hand);
-        System.out.format("現在の合計は %d です。 %n", value);
+        System.out.format(MESSAGE_FOR_VALUE_OF_PLAYER, value);
     }
 
     private static void showValueOfDealer(List<String> hand) {
         int value = calcValue(hand);
-        System.out.format("ディーラーの合計は %d です。 %n", value);
+        System.out.format(MESSAGE_FOR_VALUE_OF_DEALER, value);
     }
 
     private static int calcValue(List<String> hand) {
@@ -373,8 +366,7 @@ public class BlackJack {
         return Integer.parseInt(card);
     }
 
-    private static void drawCardsAtFirst(List<String> deck,
-            List<List<String>> eachHands, int drawTimes) {
+    private static void drawCardsAtFirst(List<String> deck, List<List<String>> eachHands, int drawTimes) {
         int lastDrawTimes = drawTimes - 1;
 
         List<String> playerHand = eachHands.get(PLAYER_INDX);
@@ -383,7 +375,7 @@ public class BlackJack {
         for (int i = 0; i < drawTimes; i++) {
 
             draw(deck, playerHand);
-            showDrawnCard(NAMES[PLAYER_INDX], playerHand);
+            showDrawnCardFaceUp(NAMES[PLAYER_INDX], playerHand);
             draw(deck, dealerHand);
 
             if (i == lastDrawTimes) {
@@ -391,7 +383,7 @@ public class BlackJack {
                 println();
                 continue;
             }
-            showDrawnCard(NAMES[DEALER_INDX], dealerHand);
+            showDrawnCardFaceUp(NAMES[DEALER_INDX], dealerHand);
             println();
         }
     }
@@ -401,12 +393,11 @@ public class BlackJack {
     }
 
     private static void showDrawnCardFaceDown(String name) {
-        System.out.format("%s に「？」が配られました。 %n", name);
+        System.out.format(MESSAGE_FOR_DRAWN_CARD_FACE_DOWN, name);
     }
 
-    private static void showDrawnCard(String name, List<String> hands) {
-        System.out.format("%s に「%s」が配られました。 %n", name,
-                getLastCardInHands(hands));
+    private static void showDrawnCardFaceUp(String name, List<String> hands) {
+        System.out.format(MESSAGE_FOR_DRAWN_CARD_FACE_UP, name, getLastCardInHands(hands));
     }
 
     private static Object getLastCardInHands(List<String> hands) {
@@ -420,10 +411,18 @@ public class BlackJack {
     }
 
     private static String drawCard(List<String> deck) {
+        if (isDeckEmpty(deck)) {
+            initDeck(deck);
+        }
+
         int firstIndx = 0;
         String drawedCard = deck.get(firstIndx);
         deck.remove(firstIndx);
         return drawedCard;
+    }
+
+    private static boolean isDeckEmpty(List<String> deck) {
+        return deck.size() == 0;
     }
 
     private static void shuffleDeck(List<String> deck) {
