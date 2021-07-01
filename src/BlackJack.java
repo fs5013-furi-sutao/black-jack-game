@@ -1,0 +1,440 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
+
+public class BlackJack {
+    private static final Scanner STDIN = new Scanner(System.in);
+
+    private static final boolean IS_DEBUG_MODE = true;
+
+    private static final int NUM_OF_PLAYERS = 2;
+    private static final int NUM_OF_CARDS_AT_FIRST = 2;
+
+    private static final int PLAYER_INDX = 0;
+    private static final int DEALER_INDX = 1;
+
+    private static final String[] NAMES = { "あなた", "ディーラー", };
+
+    private static final String[] SUIT_TYPES = { "スペード", "ダイヤ", "クラブ", "ハート", };
+
+    private static final String[] RANK_TYPES = { "A", "2", "3", "4", "5", "6",
+            "7", "8", "9", "10", "J", "Q", "K", };
+
+    private static final int FACE_CARD_VALUE = 10;
+    private static final int ACE_CARD_AS_SMALL_VALUE = 1;
+    private static final int ACE_CARD_AS_LARGE_VALUE = 11;
+    private static final int DEALER_LIMIT_VALUE = 17;
+    private static final int BLACK_JACK_VALUE = 21;
+
+    private static final int COIN_AT_STARTNIG = 100;
+    private static final int AMOUNT_OF_ONE_BET = 10;
+
+    private static final int AMOUNT_OF_COIN_BACK_AT_DRAW = 10;
+    private static final int AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN = 20;
+    private static final int AMOUNT_OF_COIN_BACK_AT_BLACK_JACK = 30;
+
+    public static void main(String[] args) {
+
+        int coins = COIN_AT_STARTNIG;
+
+        List<String> deck = new LinkedList<>();
+        initDeck(deck);
+        shuffleDeck(deck);
+
+        game(deck, coins);
+    }
+
+    private static void game(List<String> deck, int coins) {
+
+        System.out.println("----------------------------------");
+        coins = bet(coins);
+        showCoinAmount(coins);
+
+        List<List<String>> eachHands = initEachHands(NUM_OF_PLAYERS);
+        drawCardsAtFirst(deck, eachHands, NUM_OF_CARDS_AT_FIRST);
+
+        oparateByPlayer(deck, eachHands);
+        operateByDealer(deck, eachHands);
+
+        if (isWinPlayer(eachHands)) {
+            List<String> playerHand = eachHands.get(PLAYER_INDX);
+            if (isBlackJack(playerHand)) {
+                coins += AMOUNT_OF_COIN_BACK_AT_BLACK_JACK;
+
+                System.out.format("[BLACK JACK] %d の払い戻し %n",
+                        AMOUNT_OF_COIN_BACK_AT_BLACK_JACK);
+
+                showMessageBlackJack();
+                showCoinAmount(coins);
+            } else {
+                coins += AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN;
+
+                System.out.format("[勝ち] %d の払い戻し %n",
+                        AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN);
+
+                showCoinAmount(coins);
+            }
+            showMessageWin();
+            game(deck, coins);
+        }
+
+        if (isDraw(eachHands)) {
+            coins += AMOUNT_OF_COIN_BACK_AT_DRAW;
+            System.out.format("[引き分け] %d の払い戻し %n",
+                    AMOUNT_OF_COIN_BACK_AT_DRAW);
+
+            showMessageDraw();
+            showCoinAmount(coins);
+            game(deck, coins);
+        }
+
+        showMessageLose();
+
+        showPlayerHands(eachHands, IS_DEBUG_MODE);
+        showDealerHands(eachHands, IS_DEBUG_MODE);
+
+        if (hasCoin(coins)) {
+            showCoinAmount(coins);
+            game(deck, coins);
+        }
+    }
+
+    private static void showMessageWin() {
+        System.out.println("あなたの勝ちです");
+    }
+
+    private static void showMessageBlackJack() {
+        System.out.println("Black Jack です");
+    }
+
+    private static void showMessageDraw() {
+        System.out.println("引き分けです");
+    }
+
+    private static void showMessageLose() {
+        System.out.println("あなたの負けです");
+    }
+
+    private static boolean hasCoin(int coins) {
+        return coins >= AMOUNT_OF_ONE_BET;
+    }
+
+    private static void showCoinAmount(int coins) {
+        System.out.format("コイン=%d %n", coins);
+    }
+
+    private static boolean isDraw(List<List<String>> eachHands) {
+        List<String> playerHand = eachHands.get(PLAYER_INDX);
+        List<String> dealerHand = eachHands.get(DEALER_INDX);
+
+        return calcValue(playerHand) == calcValue(dealerHand)
+                || (isBusted(playerHand) && isBusted(dealerHand));
+    }
+
+    private static boolean isBlackJack(List<String> hand) {
+        return calcValue(hand) == BLACK_JACK_VALUE;
+    }
+
+    private static int bet(int coins) {
+        showMessageActionBet(AMOUNT_OF_ONE_BET);
+        return coins - AMOUNT_OF_ONE_BET;
+    }
+
+    private static void showMessageActionBet(int amount) {
+        System.out.format("%d コインを賭けた %n", amount);
+    }
+
+    private static boolean isWinPlayer(List<List<String>> eachHands) {
+        List<String> playerHand = eachHands.get(PLAYER_INDX);
+        return (isMoreThanDealerValue(eachHands) && !isBusted(playerHand))
+                || isOnlyDealerBusted(eachHands);
+    }
+
+    private static boolean isOnlyDealerBusted(List<List<String>> eachHands) {
+        List<String> playerHand = eachHands.get(PLAYER_INDX);
+        List<String> dealerHand = eachHands.get(DEALER_INDX);
+        return !isBusted(playerHand) && isBusted(dealerHand);
+    }
+
+    private static boolean isBusted(List<String> hand) {
+        return calcValue(hand) > BLACK_JACK_VALUE;
+    }
+
+    private static boolean isMoreThanDealerValue(List<List<String>> eachHands) {
+        List<String> playerHand = eachHands.get(PLAYER_INDX);
+        List<String> dealerHand = eachHands.get(DEALER_INDX);
+        return calcValue(playerHand) > calcValue(dealerHand);
+    }
+
+    private static List<List<String>> initEachHands(int numOfPlayers) {
+        List<List<String>> eachHands = new ArrayList<>();
+        for (int i = 0; i < numOfPlayers; i++) {
+            eachHands.add(new ArrayList<>());
+        }
+        return eachHands;
+    }
+
+    private static void showPlayerHands(List<List<String>> eachHands,
+            boolean isDebug) {
+
+        if (!isDebug) {
+            return;
+        }
+
+        int count = 1;
+        for (String hand : eachHands.get(PLAYER_INDX)) {
+            System.out.format("[DEBUG] Player%d=%s %n", count++, hand);
+        }
+    }
+
+    private static void showDealerHands(List<List<String>> eachHands,
+            boolean isDebug) {
+
+        if (!isDebug) {
+            return;
+        }
+
+        int count = 1;
+        for (String hand : eachHands.get(DEALER_INDX)) {
+            System.out.format("[DEBUG] Dealer%d=%s %n", count++, hand);
+        }
+    }
+
+    private static void oparateByPlayer(List<String> deck,
+            List<List<String>> eachHands) {
+
+        List<String> playerHand = eachHands.get(PLAYER_INDX);
+
+        actHitOrStandByPlayer(deck, playerHand);
+    }
+
+    private static void operateByDealer(List<String> deck,
+            List<List<String>> eachHands) {
+
+        List<String> hand = eachHands.get(DEALER_INDX);
+        actHitOrStandByDealer(deck, hand);
+
+    }
+
+    private static void actHitOrStandByDealer(List<String> deck,
+            List<String> hand) {
+
+        boolean isDealt = false;
+        while (!isValueOverDealerLimit(hand)) {
+            draw(deck, hand);
+            showDrawnCard(NAMES[DEALER_INDX], hand);
+            showValueOfDealer(hand);
+            println();
+            isDealt = true;
+        }
+
+        if (!isDealt) {
+            showValueOfDealer(hand);
+            println();
+        }
+    }
+
+    private static boolean isValueOverDealerLimit(List<String> hand) {
+        return calcValue(hand) >= DEALER_LIMIT_VALUE;
+    }
+
+    private static void actHitOrStandByPlayer(List<String> deck,
+            List<String> hand) {
+
+        showValueOfPlayer(hand);
+        String inputtedUserAnswer = requireHitOrStand();
+
+        while (isChooseActionHit(inputtedUserAnswer)) {
+            draw(deck, hand);
+            showDrawnCard(NAMES[PLAYER_INDX], hand);
+
+            showValueOfPlayer(hand);
+            println();
+
+            if (isBusted(hand)) {
+                showMessageBusted();
+                break;
+            }
+
+            if (isBlackJack(hand)) {
+                break;
+            }
+            inputtedUserAnswer = requireHitOrStand();
+        }
+        return;
+    }
+
+    private static void showMessageBusted() {
+        System.out.println("バーストしました");
+    }
+
+    private static String recieveInputtedYorN() {
+        String inputtedStr = recieveInputtedStr();
+
+        if (!isCorrectActionInRange(inputtedStr)) {
+            showMessageInvalidInput();
+            requireHitOrStand();
+            return recieveInputtedYorN();
+        }
+        return inputtedStr;
+    }
+
+    private static void showMessageInvalidInput() {
+        System.out.println("Y か N で回答してください。");
+    }
+
+    private static boolean isCorrectActionInRange(String str) {
+        return isChooseActionHit(str) || isChooseActionStand(str);
+    }
+
+    private static boolean isChooseActionStand(String str) {
+        return "N".equals(str) || "n".equals(str);
+    }
+
+    private static boolean isChooseActionHit(String str) {
+        return "Y".equals(str) || "y".equals(str);
+    }
+
+    private static String recieveInputtedStr() {
+        return STDIN.nextLine();
+    }
+
+    private static String requireHitOrStand() {
+        showMessageRequireHitOrStand();
+
+        String inputtedUserAnswer = recieveInputtedYorN();
+        println();
+        return inputtedUserAnswer;
+    }
+
+    private static void showMessageRequireHitOrStand() {
+        System.out.print("もう１枚カードを引きますか？(Y/N): ");
+    }
+
+    private static void showValueOfPlayer(List<String> hand) {
+        int value = calcValue(hand);
+        System.out.format("現在の合計は %d です。 %n", value);
+    }
+
+    private static void showValueOfDealer(List<String> hand) {
+        int value = calcValue(hand);
+        System.out.format("ディーラーの合計は %d です。 %n", value);
+    }
+
+    private static int calcValue(List<String> hand) {
+        int value = 0;
+        for (String card : hand) {
+            if (!isFaceCard(card)) {
+                value += parseToInt(card);
+                continue;
+            }
+
+            if (!isAceCard(card)) {
+                value += FACE_CARD_VALUE;
+            } else {
+                value += calcValueIfAceCard(card, value);
+            }
+        }
+
+        return value;
+    }
+
+    private static int calcValueIfAceCard(String card, int value) {
+        if (!isOverBusted(value, ACE_CARD_AS_LARGE_VALUE)) {
+            return ACE_CARD_AS_LARGE_VALUE;
+        }
+        return ACE_CARD_AS_SMALL_VALUE;
+    }
+
+    private static boolean isOverBusted(int value, int adder) {
+        return isBusted(value + adder);
+    }
+
+    private static boolean isBusted(int value) {
+        return value > BLACK_JACK_VALUE;
+    }
+
+    private static boolean isAceCard(String card) {
+        return "A".equals(card);
+    }
+
+    private static boolean isFaceCard(String card) {
+        try {
+            parseToInt(card);
+        } catch (NumberFormatException e) {
+            return true;
+        }
+        return false;
+    }
+
+    private static int parseToInt(String card) {
+        return Integer.parseInt(card);
+    }
+
+    private static void drawCardsAtFirst(List<String> deck,
+            List<List<String>> eachHands, int drawTimes) {
+        int lastDrawTimes = drawTimes - 1;
+
+        List<String> playerHand = eachHands.get(PLAYER_INDX);
+        List<String> dealerHand = eachHands.get(DEALER_INDX);
+
+        for (int i = 0; i < drawTimes; i++) {
+
+            draw(deck, playerHand);
+            showDrawnCard(NAMES[PLAYER_INDX], playerHand);
+            draw(deck, dealerHand);
+
+            if (i == lastDrawTimes) {
+                showDrawnCardFaceDown(NAMES[DEALER_INDX]);
+                println();
+                continue;
+            }
+            showDrawnCard(NAMES[DEALER_INDX], dealerHand);
+            println();
+        }
+    }
+
+    private static void println() {
+        System.out.println();
+    }
+
+    private static void showDrawnCardFaceDown(String name) {
+        System.out.format("%s に「？」が配られました。 %n", name);
+    }
+
+    private static void showDrawnCard(String name, List<String> hands) {
+        System.out.format("%s に「%s」が配られました。 %n", name,
+                getLastCardInHands(hands));
+    }
+
+    private static Object getLastCardInHands(List<String> hands) {
+        int lastIndx = hands.size() - 1;
+        return hands.get(lastIndx);
+    }
+
+    private static void draw(List<String> deck, List<String> hand) {
+        String drawedCard = drawCard(deck);
+        hand.add(drawedCard);
+    }
+
+    private static String drawCard(List<String> deck) {
+        int firstIndx = 0;
+        String drawedCard = deck.get(firstIndx);
+        deck.remove(firstIndx);
+        return drawedCard;
+    }
+
+    private static void shuffleDeck(List<String> deck) {
+        Collections.shuffle(deck);
+    }
+
+    private static void initDeck(List<String> deck) {
+        for (int i = 0; i < SUIT_TYPES.length; i++) {
+            for (String rank : RANK_TYPES) {
+                deck.add(rank);
+            }
+        }
+    }
+}
