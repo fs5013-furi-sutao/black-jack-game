@@ -98,7 +98,10 @@ public class BlackJack {
 
         runInCaseOfDraw(deck, eachHands, coins, round);
         runInCaseOfWin(deck, eachHands, coins, round);
+        runInCaseOfLose();
+    }
 
+    private static void runInCaseOfLose() {
         showMessageLose();
     }
 
@@ -245,17 +248,34 @@ public class BlackJack {
 
         boolean isDealt = false;
         while (!isValueOverDealerLimit(hand)) {
+            if (isBusted(hand)) {
+                showMessageBusted();
+                break;
+            }
+
+            if (isBlackJack(hand)) {
+                showMessageBlackJack();
+                break;
+            }
+
             draw(deck, hand);
             showDrawnCardFaceUp(NAMES[DEALER_INDX], hand);
             showValueOfDealer(hand);
-            println();
             isDealt = true;
+        }
+
+        if (isBusted(hand)) {
+            showMessageBusted();
+        }
+
+        if (isBlackJack(hand)) {
+            showMessageBlackJack();
         }
 
         if (!isDealt) {
             showValueOfDealer(hand);
-            println();
         }
+        println();
     }
 
     private static boolean isValueOverDealerLimit(List<String> hand) {
@@ -277,7 +297,6 @@ public class BlackJack {
             showDrawnCardFaceUp(NAMES[PLAYER_INDX], hand);
 
             showValueOfPlayer(hand);
-            println();
 
             if (isBusted(hand)) {
                 showMessageBusted();
@@ -289,7 +308,8 @@ public class BlackJack {
             }
             inputtedUserAnswer = requireHitOrStand();
         }
-        return;
+        println();
+        //return;
     }
 
     private static void showMessageBusted() {
