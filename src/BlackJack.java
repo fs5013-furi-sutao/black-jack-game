@@ -5,29 +5,33 @@ import java.util.List;
 import java.util.Scanner;
 
 public class BlackJack {
+    private static final String MESSAGE_FOR_DRAWN_CARD_FACE_UP = "%s に「%s」が配られました。 %n";
+    private static final String MESSAGE_FOR_DRAWN_CARD_FACE_DOWN = "%s に「？」が配られました。 %n";
+
+    private static final String MESSAGE_FOR_BUSTED = "バーストしました";
+    private static final String MESSAGE_FOR_LOSE = "あなたの負けです";
+    private static final String MESSAGE_FOR_DRAW = "引き分けです";
+    private static final String MESSAGE_FOR_WIN = "あなたの勝ちです";
+    private static final String MESSAGE_FOR_BLACK_JACK = "ブラックジャックです";
+
+    private static final String MESSAGE_FOR_COIN_AMOUNT = "[所持コイン] %d %n%n";
+    private static final String MESSAGE_FOR_ACTION_BET = "%d コインを賭けた %n";
     private static final String MESSAGE_FOR_PAY_BACK_AT_DRAW = "[引き分け] %d の払い戻し %n";
     private static final String MESSAGE_FOR_PAY_BACK_AT_WIN = "[勝ち] %d の払い戻し %n";
     private static final String MESSAGE_FOR_PAY_BACK_AT_BLACK_JACK = "[BLACK JACK] %d の払い戻し %n";
-    private static final String MESSAGE_FOR_DRAWN_CARD_FACE_UP = "%s に「%s」が配られました。 %n";
-    private static final String MESSAGE_FOR_DRAWN_CARD_FACE_DOWN = "%s に「？」が配られました。 %n";
-    private static final String MESSAGE_FOR_LOSE = "あなたの負けです";
-    private static final String MESSAGE_FOR_DRAW = "引き分けです";
-    private static final String MESSAGE_FOR_BLACK_JACK = "Black Jack です";
-    private static final String MESSAGE_FOR_WIN = "あなたの勝ちです";
-    private static final String MESSAGE_FOR_COIN_AMOUNT = "[所持コイン] %d %n%n";
-    private static final String MESSAGE_FOR_ACTION_BET = "%d コインを賭けた %n";
+
     private static final String MESSAGE_FOR_VALUE_OF_DEALER = "ディーラーの合計は %d です。 %n";
     private static final String MESSAGE_FOR_VALUE_OF_PLAYER = "現在の合計は %d です。 %n";
+
     private static final String MESSAGE_FOR_REQUIRED_HIT_OR_STAND = "もう１枚カードを引きますか？(Y/N): ";
     private static final String MESSAGE_FOR_INVALID_INPUT = "Y か N で回答してください。";
-    private static final String MESSAGE_FOR_BUSTED = "バーストしました";
 
     private static final String ROUND_START_LINE = "■ ラウンド %d : ---------------------------------- %n";
 
     private static final Scanner STDIN = new Scanner(System.in);
 
     private static final int NUM_OF_PLAYERS = 2;
-    private static final int NUM_OF_CARDS_AT_FIRST = 2;
+    private static final int NUM_OF_DRAWN_CARDS_AT_FIRST = 2;
 
     private static final int PLAYER_INDX = 0;
     private static final int DEALER_INDX = 1;
@@ -36,7 +40,8 @@ public class BlackJack {
 
     private static final String[] SUIT_TYPES = { "スペード", "ダイヤ", "クラブ", "ハート", };
 
-    private static final String[] RANK_TYPES = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", };
+    private static final String[] RANK_TYPES = { "A", "2", "3", "4", "5", "6",
+            "7", "8", "9", "10", "J", "Q", "K", };
 
     private static final int FACE_CARD_VALUE = 10;
     private static final int ACE_CARD_AS_SMALL_VALUE = 1;
@@ -56,8 +61,7 @@ public class BlackJack {
         int coins = COIN_AT_STARTNIG;
 
         List<String> deck = new LinkedList<>();
-        initDeck(deck);
-        shuffleDeck(deck);
+        prepareDeck(deck);
 
         int round = 0;
         game(deck, coins, round);
@@ -70,7 +74,7 @@ public class BlackJack {
         showCoinAmount(coins);
 
         List<List<String>> eachHands = initEachHands(NUM_OF_PLAYERS);
-        drawCardsAtFirst(deck, eachHands, NUM_OF_CARDS_AT_FIRST);
+        drawCardsAtFirst(deck, eachHands, NUM_OF_DRAWN_CARDS_AT_FIRST);
 
         oparateByPlayer(deck, eachHands);
         operateByDealer(deck, eachHands);
@@ -80,30 +84,33 @@ public class BlackJack {
             if (isBlackJack(playerHand)) {
                 coins += AMOUNT_OF_COIN_BACK_AT_BLACK_JACK;
 
-                System.out.format(MESSAGE_FOR_PAY_BACK_AT_BLACK_JACK, AMOUNT_OF_COIN_BACK_AT_BLACK_JACK);
+                System.out.format(MESSAGE_FOR_PAY_BACK_AT_BLACK_JACK,
+                        AMOUNT_OF_COIN_BACK_AT_BLACK_JACK);
 
                 showMessageBlackJack();
                 showCoinAmount(coins);
             } else {
                 coins += AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN;
 
-                System.out.format(MESSAGE_FOR_PAY_BACK_AT_WIN, AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN);
+                System.out.format(MESSAGE_FOR_PAY_BACK_AT_WIN,
+                        AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN);
 
                 showCoinAmount(coins);
             }
             showMessageWin();
-            
+
             game(deck, coins, round);
             return;
         }
 
         if (isDraw(eachHands)) {
             coins += AMOUNT_OF_COIN_BACK_AT_DRAW;
-            System.out.format(MESSAGE_FOR_PAY_BACK_AT_DRAW, AMOUNT_OF_COIN_BACK_AT_DRAW);
+            System.out.format(MESSAGE_FOR_PAY_BACK_AT_DRAW,
+                    AMOUNT_OF_COIN_BACK_AT_DRAW);
 
             showMessageDraw();
             showCoinAmount(coins);
-            
+
             game(deck, coins, round);
             return;
         }
@@ -112,7 +119,7 @@ public class BlackJack {
 
         if (hasCoin(coins)) {
             showCoinAmount(coins);
-            
+
             game(deck, coins, round);
             return;
         }
@@ -150,7 +157,8 @@ public class BlackJack {
         List<String> playerHand = eachHands.get(PLAYER_INDX);
         List<String> dealerHand = eachHands.get(DEALER_INDX);
 
-        return calcValue(playerHand) == calcValue(dealerHand) || (isBusted(playerHand) && isBusted(dealerHand));
+        return calcValue(playerHand) == calcValue(dealerHand)
+                || (isBusted(playerHand) && isBusted(dealerHand));
     }
 
     private static boolean isBlackJack(List<String> hand) {
@@ -168,7 +176,8 @@ public class BlackJack {
 
     private static boolean isWinPlayer(List<List<String>> eachHands) {
         List<String> playerHand = eachHands.get(PLAYER_INDX);
-        return (isMoreThanDealerValue(eachHands) && !isBusted(playerHand)) || isOnlyDealerBusted(eachHands);
+        return (isMoreThanDealerValue(eachHands) && !isBusted(playerHand))
+                || isOnlyDealerBusted(eachHands);
     }
 
     private static boolean isOnlyDealerBusted(List<List<String>> eachHands) {
@@ -195,21 +204,24 @@ public class BlackJack {
         return eachHands;
     }
 
-    private static void oparateByPlayer(List<String> deck, List<List<String>> eachHands) {
+    private static void oparateByPlayer(List<String> deck,
+            List<List<String>> eachHands) {
 
         List<String> playerHand = eachHands.get(PLAYER_INDX);
 
         actHitOrStandByPlayer(deck, playerHand);
     }
 
-    private static void operateByDealer(List<String> deck, List<List<String>> eachHands) {
+    private static void operateByDealer(List<String> deck,
+            List<List<String>> eachHands) {
 
         List<String> hand = eachHands.get(DEALER_INDX);
         actHitOrStandByDealer(deck, hand);
 
     }
 
-    private static void actHitOrStandByDealer(List<String> deck, List<String> hand) {
+    private static void actHitOrStandByDealer(List<String> deck,
+            List<String> hand) {
 
         boolean isDealt = false;
         while (!isValueOverDealerLimit(hand)) {
@@ -230,7 +242,8 @@ public class BlackJack {
         return calcValue(hand) >= DEALER_LIMIT_VALUE;
     }
 
-    private static void actHitOrStandByPlayer(List<String> deck, List<String> hand) {
+    private static void actHitOrStandByPlayer(List<String> deck,
+            List<String> hand) {
 
         if (isBlackJack(hand)) {
             return;
@@ -366,7 +379,8 @@ public class BlackJack {
         return Integer.parseInt(card);
     }
 
-    private static void drawCardsAtFirst(List<String> deck, List<List<String>> eachHands, int drawTimes) {
+    private static void drawCardsAtFirst(List<String> deck,
+            List<List<String>> eachHands, int drawTimes) {
         int lastDrawTimes = drawTimes - 1;
 
         List<String> playerHand = eachHands.get(PLAYER_INDX);
@@ -397,7 +411,8 @@ public class BlackJack {
     }
 
     private static void showDrawnCardFaceUp(String name, List<String> hands) {
-        System.out.format(MESSAGE_FOR_DRAWN_CARD_FACE_UP, name, getLastCardInHands(hands));
+        System.out.format(MESSAGE_FOR_DRAWN_CARD_FACE_UP, name,
+                getLastCardInHands(hands));
     }
 
     private static Object getLastCardInHands(List<String> hands) {
@@ -425,15 +440,20 @@ public class BlackJack {
         return deck.size() == 0;
     }
 
-    private static void shuffleDeck(List<String> deck) {
-        Collections.shuffle(deck);
-    }
-
     private static void initDeck(List<String> deck) {
         for (int i = 0; i < SUIT_TYPES.length; i++) {
             for (String rank : RANK_TYPES) {
                 deck.add(rank);
             }
         }
+    }
+
+    private static void shuffleDeck(List<String> deck) {
+        Collections.shuffle(deck);
+    }
+
+    private static void prepareDeck(List<String> deck) {
+        initDeck(deck);
+        shuffleDeck(deck);
     }
 }
