@@ -286,6 +286,8 @@ public class BlackJack {
             List<String> hand) {
 
         if (isBlackJack(hand)) {
+            showMessageBusted();
+            println();
             return;
         }
 
@@ -300,6 +302,7 @@ public class BlackJack {
 
             if (isBusted(hand)) {
                 showMessageBusted();
+                println();
                 break;
             }
 
@@ -308,8 +311,6 @@ public class BlackJack {
             }
             inputtedUserAnswer = requireHitOrStand();
         }
-        println();
-        //return;
     }
 
     private static void showMessageBusted() {
