@@ -79,6 +79,19 @@ public class BlackJack {
         oparateByPlayer(deck, eachHands);
         operateByDealer(deck, eachHands);
 
+        judgeResult(deck, eachHands, coins, round);
+
+        if (hasCoin(coins)) {
+            showCoinAmount(coins);
+
+            playGame(deck, coins, round);
+            return;
+        }
+    }
+
+    private static void judgeResult(List<String> deck,
+            List<List<String>> eachHands, int coins, int round) {
+
         if (isWinPlayer(eachHands)) {
             List<String> playerHand = eachHands.get(PLAYER_INDX);
             if (isBlackJack(playerHand)) {
@@ -89,6 +102,7 @@ public class BlackJack {
 
                 showMessageBlackJack();
                 showCoinAmount(coins);
+
             } else {
                 coins += AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN;
 
@@ -98,7 +112,6 @@ public class BlackJack {
                 showCoinAmount(coins);
             }
             showMessageWin();
-
             playGame(deck, coins, round);
             return;
         }
@@ -114,15 +127,7 @@ public class BlackJack {
             playGame(deck, coins, round);
             return;
         }
-
         showMessageLose();
-
-        if (hasCoin(coins)) {
-            showCoinAmount(coins);
-
-            playGame(deck, coins, round);
-            return;
-        }
     }
 
     private static void showRoundStartLine(int round) {
