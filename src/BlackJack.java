@@ -97,6 +97,13 @@ public class BlackJack {
             List<List<String>> eachHands, int coins, int round) {
 
         runInCaseOfDraw(deck, eachHands, coins, round);
+        runInCaseOfWin(deck, eachHands, coins, round);
+
+        showMessageLose();
+    }
+
+    private static void runInCaseOfWin(List<String> deck,
+            List<List<String>> eachHands, int coins, int round) {
 
         if (isWinPlayer(eachHands)) {
             List<String> playerHand = eachHands.get(PLAYER_INDX);
@@ -121,8 +128,6 @@ public class BlackJack {
             playGame(deck, coins, round);
             return;
         }
-
-        showMessageLose();
     }
 
     private static void runInCaseOfDraw(List<String> deck,
