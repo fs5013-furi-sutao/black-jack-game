@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class BlackJack {
     private static final String MESSAGE_FOR_DRAWN_CARD_FACE_UP = "%s に「%s」が配られました。 %n";
     private static final String MESSAGE_FOR_DRAWN_CARD_FACE_DOWN = "%s に「？」が配られました。 %n";
+    private static final String MESSAGE_FOR_DEALER_TURN_UP_HAND = "ディーラーの「？」のカードは「%s」でした。 %n";
 
     private static final String MESSAGE_FOR_BUSTED = "バーストしました";
     private static final String MESSAGE_FOR_LOSE = "あなたの負けです";
@@ -32,6 +33,7 @@ public class BlackJack {
 
     private static final int NUM_OF_PLAYERS = 2;
     private static final int NUM_OF_DRAWN_CARDS_AT_FIRST = 2;
+    private static final int SECOND_HAND_INDX = 1;
 
     private static final int PLAYER_INDX = 0;
     private static final int DEALER_INDX = 1;
@@ -256,8 +258,12 @@ public class BlackJack {
             List<List<String>> eachHands) {
 
         List<String> hand = getDealerHand(eachHands);
+        showDealerTurnUpHand(hand, SECOND_HAND_INDX);
         actHitOrStandByDealer(deck, hand);
+    }
 
+    private static void showDealerTurnUpHand(List<String> hand, int index) {
+        System.out.format(MESSAGE_FOR_DEALER_TURN_UP_HAND, hand.get(index));
     }
 
     private static void actHitOrStandByDealer(List<String> deck,
