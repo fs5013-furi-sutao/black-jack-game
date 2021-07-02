@@ -64,10 +64,10 @@ public class BlackJack {
         prepareDeck(deck);
 
         int round = 0;
-        game(deck, coins, round);
+        playGame(deck, coins, round);
     }
 
-    private static void game(List<String> deck, int coins, int round) {
+    private static void playGame(List<String> deck, int coins, int round) {
 
         showRoundStartLine(++round);
         coins = bet(coins);
@@ -99,7 +99,7 @@ public class BlackJack {
             }
             showMessageWin();
 
-            game(deck, coins, round);
+            playGame(deck, coins, round);
             return;
         }
 
@@ -111,7 +111,7 @@ public class BlackJack {
             showMessageDraw();
             showCoinAmount(coins);
 
-            game(deck, coins, round);
+            playGame(deck, coins, round);
             return;
         }
 
@@ -120,7 +120,7 @@ public class BlackJack {
         if (hasCoin(coins)) {
             showCoinAmount(coins);
 
-            game(deck, coins, round);
+            playGame(deck, coins, round);
             return;
         }
     }
