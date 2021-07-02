@@ -109,43 +109,53 @@ public class BlackJack {
             List<List<String>> eachHands, int coins, int round) {
 
         if (isWinPlayer(eachHands)) {
-            List<String> playerHand = eachHands.get(PLAYER_INDX);
+            List<String> playerHand = getPlayerHand(eachHands);
+
             if (isBlackJack(playerHand)) {
                 coins += AMOUNT_OF_COIN_BACK_AT_BLACK_JACK;
-
-                System.out.format(MESSAGE_FOR_PAY_BACK_AT_BLACK_JACK,
-                        AMOUNT_OF_COIN_BACK_AT_BLACK_JACK);
-
+                showMessagePayBackAtBlackJack();
                 showMessageBlackJack();
                 showCoinAmount(coins);
 
             } else {
                 coins += AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN;
-
-                System.out.format(MESSAGE_FOR_PAY_BACK_AT_WIN,
-                        AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN);
-
+                showMessagePayBackAtNormalWin();
                 showCoinAmount(coins);
             }
+
             showMessageWin();
             playGame(deck, coins, round);
             return;
         }
     }
 
+    private static void showMessagePayBackAtNormalWin() {
+        System.out.format(MESSAGE_FOR_PAY_BACK_AT_WIN,
+                AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN);
+    }
+
+    private static void showMessagePayBackAtBlackJack() {
+        System.out.format(MESSAGE_FOR_PAY_BACK_AT_BLACK_JACK,
+                AMOUNT_OF_COIN_BACK_AT_BLACK_JACK);
+    }
+
     private static void runInCaseOfDraw(List<String> deck,
             List<List<String>> eachHands, int coins, int round) {
+
         if (isDraw(eachHands)) {
             coins += AMOUNT_OF_COIN_BACK_AT_DRAW;
-            System.out.format(MESSAGE_FOR_PAY_BACK_AT_DRAW,
-                    AMOUNT_OF_COIN_BACK_AT_DRAW);
-
+            showMessagePayBackAtDraw();
             showMessageDraw();
             showCoinAmount(coins);
 
             playGame(deck, coins, round);
             return;
         }
+    }
+
+    private static void showMessagePayBackAtDraw() {
+        System.out.format(MESSAGE_FOR_PAY_BACK_AT_DRAW,
+                AMOUNT_OF_COIN_BACK_AT_DRAW);
     }
 
     private static void showRoundStartLine(int round) {
@@ -177,11 +187,19 @@ public class BlackJack {
     }
 
     private static boolean isDraw(List<List<String>> eachHands) {
-        List<String> playerHand = eachHands.get(PLAYER_INDX);
-        List<String> dealerHand = eachHands.get(DEALER_INDX);
+        List<String> playerHand = getPlayerHand(eachHands);
+        List<String> dealerHand = getDealerHand(eachHands);
 
         return calcValue(playerHand) == calcValue(dealerHand)
                 || (isBusted(playerHand) && isBusted(dealerHand));
+    }
+
+    private static List<String> getDealerHand(List<List<String>> eachHands) {
+        return eachHands.get(DEALER_INDX);
+    }
+
+    private static List<String> getPlayerHand(List<List<String>> eachHands) {
+        return eachHands.get(PLAYER_INDX);
     }
 
     private static boolean isBlackJack(List<String> hand) {
@@ -198,14 +216,14 @@ public class BlackJack {
     }
 
     private static boolean isWinPlayer(List<List<String>> eachHands) {
-        List<String> playerHand = eachHands.get(PLAYER_INDX);
+        List<String> playerHand = getPlayerHand(eachHands);
         return (isMoreThanDealerValue(eachHands) && !isBusted(playerHand))
                 || isOnlyDealerBusted(eachHands);
     }
 
     private static boolean isOnlyDealerBusted(List<List<String>> eachHands) {
-        List<String> playerHand = eachHands.get(PLAYER_INDX);
-        List<String> dealerHand = eachHands.get(DEALER_INDX);
+        List<String> playerHand = getPlayerHand(eachHands);
+        List<String> dealerHand = getDealerHand(eachHands);
         return !isBusted(playerHand) && isBusted(dealerHand);
     }
 
@@ -214,8 +232,8 @@ public class BlackJack {
     }
 
     private static boolean isMoreThanDealerValue(List<List<String>> eachHands) {
-        List<String> playerHand = eachHands.get(PLAYER_INDX);
-        List<String> dealerHand = eachHands.get(DEALER_INDX);
+        List<String> playerHand = getPlayerHand(eachHands);
+        List<String> dealerHand = getDealerHand(eachHands);
         return calcValue(playerHand) > calcValue(dealerHand);
     }
 
@@ -230,15 +248,14 @@ public class BlackJack {
     private static void oparateByPlayer(List<String> deck,
             List<List<String>> eachHands) {
 
-        List<String> playerHand = eachHands.get(PLAYER_INDX);
-
+        List<String> playerHand = getPlayerHand(eachHands);
         actHitOrStandByPlayer(deck, playerHand);
     }
 
     private static void operateByDealer(List<String> deck,
             List<List<String>> eachHands) {
 
-        List<String> hand = eachHands.get(DEALER_INDX);
+        List<String> hand = getDealerHand(eachHands);
         actHitOrStandByDealer(deck, hand);
 
     }
@@ -264,18 +281,25 @@ public class BlackJack {
             isDealt = true;
         }
 
-        if (isBusted(hand)) {
-            showMessageBusted();
-        }
-
-        if (isBlackJack(hand)) {
-            showMessageBlackJack();
-        }
+        runInCaseOfBusted(hand);
+        runInCaseOfBlackJack(hand);
 
         if (!isDealt) {
             showValueOfDealer(hand);
         }
         println();
+    }
+
+    private static void runInCaseOfBlackJack(List<String> hand) {
+        if (isBlackJack(hand)) {
+            showMessageBlackJack();
+        }
+    }
+
+    private static void runInCaseOfBusted(List<String> hand) {
+        if (isBusted(hand)) {
+            showMessageBusted();
+        }
     }
 
     private static boolean isValueOverDealerLimit(List<String> hand) {
@@ -297,7 +321,6 @@ public class BlackJack {
         while (isChooseActionHit(inputtedUserAnswer)) {
             draw(deck, hand);
             showDrawnCardFaceUp(NAMES[PLAYER_INDX], hand);
-
             showValueOfPlayer(hand);
 
             if (isBusted(hand)) {
@@ -380,9 +403,9 @@ public class BlackJack {
 
             if (!isAceCard(card)) {
                 value += FACE_CARD_VALUE;
-            } else {
-                value += calcValueIfAceCard(card, value);
             }
+
+            value += calcValueIfAceCard(card, value);
         }
 
         return value;
@@ -424,8 +447,8 @@ public class BlackJack {
             List<List<String>> eachHands, int drawTimes) {
         int lastDrawTimes = drawTimes - 1;
 
-        List<String> playerHand = eachHands.get(PLAYER_INDX);
-        List<String> dealerHand = eachHands.get(DEALER_INDX);
+        List<String> playerHand = getPlayerHand(eachHands);
+        List<String> dealerHand = getDealerHand(eachHands);
 
         for (int i = 0; i < drawTimes; i++) {
 
@@ -468,7 +491,7 @@ public class BlackJack {
 
     private static String drawCard(List<String> deck) {
         if (isDeckEmpty(deck)) {
-            initDeck(deck);
+            prepareDeck(deck);
         }
 
         int firstIndx = 0;
