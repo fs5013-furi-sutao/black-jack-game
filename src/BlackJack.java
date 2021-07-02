@@ -96,17 +96,7 @@ public class BlackJack {
     private static void judgeResult(List<String> deck,
             List<List<String>> eachHands, int coins, int round) {
 
-        if (isDraw(eachHands)) {
-            coins += AMOUNT_OF_COIN_BACK_AT_DRAW;
-            System.out.format(MESSAGE_FOR_PAY_BACK_AT_DRAW,
-                    AMOUNT_OF_COIN_BACK_AT_DRAW);
-
-            showMessageDraw();
-            showCoinAmount(coins);
-
-            playGame(deck, coins, round);
-            return;
-        }
+        runInCaseOfDraw(deck, eachHands, coins, round);
 
         if (isWinPlayer(eachHands)) {
             List<String> playerHand = eachHands.get(PLAYER_INDX);
@@ -133,6 +123,21 @@ public class BlackJack {
         }
 
         showMessageLose();
+    }
+
+    private static void runInCaseOfDraw(List<String> deck,
+            List<List<String>> eachHands, int coins, int round) {
+        if (isDraw(eachHands)) {
+            coins += AMOUNT_OF_COIN_BACK_AT_DRAW;
+            System.out.format(MESSAGE_FOR_PAY_BACK_AT_DRAW,
+                    AMOUNT_OF_COIN_BACK_AT_DRAW);
+
+            showMessageDraw();
+            showCoinAmount(coins);
+
+            playGame(deck, coins, round);
+            return;
+        }
     }
 
     private static void showRoundStartLine(int round) {
