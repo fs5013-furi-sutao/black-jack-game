@@ -105,9 +105,8 @@ public class BlackJack {
 
     private static void runInCaseOfLose(List<List<String>> eachHands) {
         if (isLosePlayer(eachHands)) {
-
+            showMessageLose();
         }
-        showMessageLose();
     }
 
     private static int runInCaseOfWin(List<List<String>> eachHands, int coins) {
