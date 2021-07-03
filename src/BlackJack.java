@@ -100,10 +100,13 @@ public class BlackJack {
 
         coins = runInCaseOfDraw(eachHands, coins);
         coins = runInCaseOfWin(eachHands, coins);
-        runInCaseOfLose();
+        runInCaseOfLose(eachHands);
     }
 
-    private static void runInCaseOfLose() {
+    private static void runInCaseOfLose(List<List<String>> eachHands) {
+        if (isLosePlayer(eachHands)) {
+
+        }
         showMessageLose();
     }
 
@@ -184,14 +187,6 @@ public class BlackJack {
         System.out.format(MESSAGE_FOR_COIN_AMOUNT, coins);
     }
 
-    private static boolean isDraw(List<List<String>> eachHands) {
-        List<String> playerHand = getPlayerHand(eachHands);
-        List<String> dealerHand = getDealerHand(eachHands);
-
-        return calcValue(playerHand) == calcValue(dealerHand)
-                || (isBusted(playerHand) && isBusted(dealerHand));
-    }
-
     private static List<String> getDealerHand(List<List<String>> eachHands) {
         return eachHands.get(DEALER_INDX);
     }
@@ -217,6 +212,18 @@ public class BlackJack {
         List<String> playerHand = getPlayerHand(eachHands);
         return (isMoreThanDealerValue(eachHands) && !isBusted(playerHand))
                 || isOnlyDealerBusted(eachHands);
+    }
+
+    private static boolean isLosePlayer(List<List<String>> eachHands) {
+        return !isWinPlayer(eachHands) && !isDraw(eachHands);
+    }
+
+    private static boolean isDraw(List<List<String>> eachHands) {
+        List<String> playerHand = getPlayerHand(eachHands);
+        List<String> dealerHand = getDealerHand(eachHands);
+
+        return calcValue(playerHand) == calcValue(dealerHand)
+                || (isBusted(playerHand) && isBusted(dealerHand));
     }
 
     private static boolean isOnlyDealerBusted(List<List<String>> eachHands) {
