@@ -62,18 +62,18 @@ public class BlackJack {
 
         int coins = COIN_AT_STARTNIG;
 
-        List<String> deck = new LinkedList<>();
-        prepareDeck(deck);
-
         int round = 0;
-        playGame(deck, coins, round);
+        playGame(coins, round);
     }
 
-    private static void playGame(List<String> deck, int coins, int round) {
+    private static void playGame(int coins, int round) {
 
         showRoundStartLine(++round);
         coins = bet(coins);
         showCoinAmount(coins);
+
+        List<String> deck = new LinkedList<>();
+        prepareDeck(deck);
 
         List<List<String>> eachHands = initEachHands(NUM_OF_PLAYERS);
         drawCardsAtFirst(deck, eachHands, NUM_OF_DRAWN_CARDS_AT_FIRST);
