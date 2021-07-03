@@ -292,7 +292,7 @@ public class BlackJack {
     private static void actHitOrStandByPlayer(List<String> deck,
             List<String> hand) {
         if (isBlackJack(hand)) {
-            show(MESSAGE_FOR_BUSTED);
+            show(MESSAGE_FOR_BLACK_JACK);
             println();
             return;
         }
