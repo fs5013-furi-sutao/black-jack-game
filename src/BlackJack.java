@@ -60,14 +60,12 @@ public class BlackJack {
     private static final int AMOUNT_OF_COIN_BACK_AT_BLACK_JACK = 30;
 
     public static void main(String[] args) {
-
         int coins = COIN_AT_STARTNIG;
         int round = 0;
         playGame(coins, round);
     }
 
     private static void playGame(int coins, int round) {
-
         showRoundStartLine(++round);
         coins = bet(coins);
         showCoinAmount(coins);
@@ -92,7 +90,6 @@ public class BlackJack {
 
     private static void judgeResult(List<String> deck,
             List<List<String>> eachHands, int coins, int round) {
-
         coins = runInCaseOfDraw(eachHands, coins);
         coins = runInCaseOfWin(eachHands, coins);
         runInCaseOfLose(eachHands);
@@ -105,7 +102,6 @@ public class BlackJack {
     }
 
     private static int runInCaseOfWin(List<List<String>> eachHands, int coins) {
-
         if (isWinPlayer(eachHands)) {
             List<String> playerHand = getPlayerHand(eachHands);
 
@@ -136,7 +132,6 @@ public class BlackJack {
 
     private static int runInCaseOfDraw(List<List<String>> eachHands,
             int coins) {
-
         if (isDraw(eachHands)) {
             coins += AMOUNT_OF_COIN_BACK_AT_DRAW;
             showMessagePayBackAtDraw();
@@ -211,7 +206,6 @@ public class BlackJack {
     private static boolean isDraw(List<List<String>> eachHands) {
         List<String> playerHand = getPlayerHand(eachHands);
         List<String> dealerHand = getDealerHand(eachHands);
-
         return calcValue(playerHand) == calcValue(dealerHand)
                 || (isBusted(playerHand) && isBusted(dealerHand));
     }
@@ -242,14 +236,12 @@ public class BlackJack {
 
     private static void oparateByPlayer(List<String> deck,
             List<List<String>> eachHands) {
-
         List<String> playerHand = getPlayerHand(eachHands);
         actHitOrStandByPlayer(deck, playerHand);
     }
 
     private static void operateByDealer(List<String> deck,
             List<List<String>> eachHands) {
-
         List<String> hand = getDealerHand(eachHands);
         showDealerTurnUpHand(hand, SECOND_HAND_INDX);
         actHitOrStandByDealer(deck, hand);
@@ -261,7 +253,6 @@ public class BlackJack {
 
     private static void actHitOrStandByDealer(List<String> deck,
             List<String> hand) {
-
         boolean isDealt = false;
         while (!isValueOverDealerLimit(hand)) {
 
@@ -300,7 +291,6 @@ public class BlackJack {
 
     private static void actHitOrStandByPlayer(List<String> deck,
             List<String> hand) {
-
         if (isBlackJack(hand)) {
             show(MESSAGE_FOR_BUSTED);
             println();
@@ -356,7 +346,6 @@ public class BlackJack {
     }
 
     private static String requireHitOrStand() {
-
         showWithNoLine(MESSAGE_FOR_REQUIRED_HIT_OR_STAND);
 
         String inputtedUserAnswer = recieveInputtedYorN();
@@ -409,7 +398,7 @@ public class BlackJack {
     }
 
     private static boolean isAceCard(String card) {
-        return "A".equals(card);
+        return ACE_CARD.equals(card);
     }
 
     private static boolean isFaceCard(String card) {
