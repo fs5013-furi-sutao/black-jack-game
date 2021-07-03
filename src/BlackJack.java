@@ -42,6 +42,7 @@ public class BlackJack {
 
     private static final String[] SUIT_TYPES = { "スペード", "ダイヤ", "クラブ", "ハート", };
 
+    private static final String ACE_CARD = "A";
     private static final String[] RANK_TYPES = { "A", "2", "3", "4", "5", "6",
             "7", "8", "9", "10", "J", "Q", "K", };
 
@@ -186,7 +187,11 @@ public class BlackJack {
     }
 
     private static boolean isBlackJack(List<String> hand) {
-        return calcValue(hand) == BLACK_JACK_VALUE;
+        return has(hand, ACE_CARD) && hand.size() == 2 && calcValue(hand) == BLACK_JACK_VALUE;
+    }
+
+    private static boolean has(List<String> hand, String card) {
+        return hand.contains(card);
     }
 
     private static int bet(int coins) {
