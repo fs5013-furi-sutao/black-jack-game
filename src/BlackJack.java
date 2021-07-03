@@ -165,10 +165,6 @@ public class BlackJack {
         System.out.format(ROUND_START_LINE, round);
     }
 
-    private static void showMessageBlackJack() {
-        System.out.println(MESSAGE_FOR_BLACK_JACK);
-    }
-
     private static boolean hasCoin(int coins) {
         return coins >= AMOUNT_OF_ONE_BET;
     }
