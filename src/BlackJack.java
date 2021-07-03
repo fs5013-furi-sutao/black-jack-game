@@ -82,12 +82,7 @@ public class BlackJack {
         operateByDealer(deck, eachHands);
 
         judgeResult(deck, eachHands, coins, round);
-        decideContinueGame(deck, coins, round);
-    }
-
-    private static void decideContinueGame(List<String> deck, int coins,
-            int round) {
-
+        
         if (hasCoin(coins)) {
             showCoinAmount(coins);
             playGame(coins, round);
