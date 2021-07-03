@@ -79,7 +79,7 @@ public class BlackJack {
         oparateByPlayer(deck, eachHands);
         operateByDealer(deck, eachHands);
 
-        judgeResult(deck, eachHands, coins, round);
+        coins = judgeResult(eachHands, coins);
         
         if (hasCoin(coins)) {
             showCoinAmount(coins);
@@ -88,11 +88,11 @@ public class BlackJack {
         }
     }
 
-    private static void judgeResult(List<String> deck,
-            List<List<String>> eachHands, int coins, int round) {
+    private static int judgeResult(List<List<String>> eachHands, int coins) {
         coins = runInCaseOfDraw(eachHands, coins);
         coins = runInCaseOfWin(eachHands, coins);
         runInCaseOfLose(eachHands);
+        return coins;
     }
 
     private static void runInCaseOfLose(List<List<String>> eachHands) {
