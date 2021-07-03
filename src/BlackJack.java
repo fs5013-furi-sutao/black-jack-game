@@ -134,6 +134,10 @@ public class BlackJack {
         System.out.println(message);
     }
 
+    private static void showWithNoLine(String message) {
+        System.out.print(message);
+    }
+
     private static int runInCaseOfDraw(List<List<String>> eachHands,
             int coins) {
 
@@ -353,7 +357,7 @@ public class BlackJack {
 
     private static String requireHitOrStand() {
 
-        show(MESSAGE_FOR_REQUIRED_HIT_OR_STAND);
+        showWithNoLine(MESSAGE_FOR_REQUIRED_HIT_OR_STAND);
 
         String inputtedUserAnswer = recieveInputtedYorN();
         println();
