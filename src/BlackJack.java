@@ -61,7 +61,6 @@ public class BlackJack {
     public static void main(String[] args) {
 
         int coins = COIN_AT_STARTNIG;
-
         int round = 0;
         playGame(coins, round);
     }
@@ -105,7 +104,7 @@ public class BlackJack {
 
     private static void runInCaseOfLose(List<List<String>> eachHands) {
         if (isLosePlayer(eachHands)) {
-            showMessageLose();
+            show(MESSAGE_FOR_LOSE);
         }
     }
 
@@ -117,7 +116,7 @@ public class BlackJack {
             if (isBlackJack(playerHand)) {
                 coins += AMOUNT_OF_COIN_BACK_AT_BLACK_JACK;
                 showMessagePayBackAtBlackJack();
-                showMessageBlackJack();
+                show(MESSAGE_FOR_BLACK_JACK);
                 showCoinAmount(coins);
 
             } else {
@@ -126,9 +125,13 @@ public class BlackJack {
                 showCoinAmount(coins);
             }
 
-            showMessageWin();
+            show(MESSAGE_FOR_WIN);
         }
         return coins;
+    }
+
+    private static void show(String message) {
+        System.out.println(message);
     }
 
     private static int runInCaseOfDraw(List<List<String>> eachHands,
@@ -137,7 +140,7 @@ public class BlackJack {
         if (isDraw(eachHands)) {
             coins += AMOUNT_OF_COIN_BACK_AT_DRAW;
             showMessagePayBackAtDraw();
-            showMessageDraw();
+            show(MESSAGE_FOR_DRAW);
             showCoinAmount(coins);
         }
         return coins;
@@ -162,20 +165,8 @@ public class BlackJack {
         System.out.format(ROUND_START_LINE, round);
     }
 
-    private static void showMessageWin() {
-        System.out.println(MESSAGE_FOR_WIN);
-    }
-
     private static void showMessageBlackJack() {
         System.out.println(MESSAGE_FOR_BLACK_JACK);
-    }
-
-    private static void showMessageDraw() {
-        System.out.println(MESSAGE_FOR_DRAW);
-    }
-
-    private static void showMessageLose() {
-        System.out.println(MESSAGE_FOR_LOSE);
     }
 
     private static boolean hasCoin(int coins) {
@@ -293,13 +284,13 @@ public class BlackJack {
 
     private static void runInCaseOfBlackJack(List<String> hand) {
         if (isBlackJack(hand)) {
-            showMessageBlackJack();
+            show(MESSAGE_FOR_BLACK_JACK);
         }
     }
 
     private static void runInCaseOfBusted(List<String> hand) {
         if (isBusted(hand)) {
-            showMessageBusted();
+            show(MESSAGE_FOR_BUSTED);
         }
     }
 
@@ -311,7 +302,7 @@ public class BlackJack {
             List<String> hand) {
 
         if (isBlackJack(hand)) {
-            showMessageBusted();
+            show(MESSAGE_FOR_BUSTED);
             println();
             return;
         }
@@ -325,7 +316,7 @@ public class BlackJack {
             showValueOfPlayer(hand);
 
             if (isBusted(hand)) {
-                showMessageBusted();
+                show(MESSAGE_FOR_BUSTED);
                 println();
                 break;
             }
@@ -337,23 +328,15 @@ public class BlackJack {
         }
     }
 
-    private static void showMessageBusted() {
-        System.out.println(MESSAGE_FOR_BUSTED);
-    }
-
     private static String recieveInputtedYorN() {
         String inputtedStr = recieveInputtedStr();
 
         if (!isCorrectActionInRange(inputtedStr)) {
-            showMessageInvalidInput();
+            show(MESSAGE_FOR_INVALID_INPUT);
 
             return requireHitOrStand();
         }
         return inputtedStr;
-    }
-
-    private static void showMessageInvalidInput() {
-        System.out.println(MESSAGE_FOR_INVALID_INPUT);
     }
 
     private static boolean isCorrectActionInRange(String str) {
@@ -373,15 +356,12 @@ public class BlackJack {
     }
 
     private static String requireHitOrStand() {
-        showMessageRequireHitOrStand();
+
+        show(MESSAGE_FOR_REQUIRED_HIT_OR_STAND);
 
         String inputtedUserAnswer = recieveInputtedYorN();
         println();
         return inputtedUserAnswer;
-    }
-
-    private static void showMessageRequireHitOrStand() {
-        System.out.print(MESSAGE_FOR_REQUIRED_HIT_OR_STAND);
     }
 
     private static void showValueOfPlayer(List<String> hand) {
