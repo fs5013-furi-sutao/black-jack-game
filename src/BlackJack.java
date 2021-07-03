@@ -90,7 +90,7 @@ public class BlackJack {
 
         if (hasCoin(coins)) {
             showCoinAmount(coins);
-            playGame(deck, coins, round);
+            playGame(coins, round);
             return;
         }
     }
