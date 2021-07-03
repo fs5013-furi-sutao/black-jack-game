@@ -273,18 +273,11 @@ public class BlackJack {
 
         boolean isDealt = false;
         while (!isValueOverDealerLimit(hand)) {
-            if (isBusted(hand)) {
-                showMessageBusted();
-                break;
-            }
 
-            if (isBlackJack(hand)) {
-                showMessageBlackJack();
-                break;
+            if (!isBusted(hand) && !isBlackJack(hand)) {
+                draw(deck, hand);
+                showDrawnCardFaceUp(NAMES[DEALER_INDX], hand);
             }
-
-            draw(deck, hand);
-            showDrawnCardFaceUp(NAMES[DEALER_INDX], hand);
             showValueOfDealer(hand);
             isDealt = true;
         }
