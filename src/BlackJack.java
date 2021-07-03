@@ -126,8 +126,6 @@ public class BlackJack {
             }
 
             showMessageWin();
-            playGame(deck, coins, round);
-            return;
         }
     }
 
@@ -149,9 +147,6 @@ public class BlackJack {
             showMessagePayBackAtDraw();
             showMessageDraw();
             showCoinAmount(coins);
-
-            playGame(deck, coins, round);
-            return;
         }
     }
 
