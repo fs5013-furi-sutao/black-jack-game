@@ -98,8 +98,8 @@ public class BlackJack {
     private static void judgeResult(List<String> deck,
             List<List<String>> eachHands, int coins, int round) {
 
-        runInCaseOfDraw(deck, eachHands, coins, round);
-        runInCaseOfWin(deck, eachHands, coins, round);
+        coins = runInCaseOfDraw(eachHands, coins);
+        coins = runInCaseOfWin(eachHands, coins);
         runInCaseOfLose();
     }
 
@@ -107,8 +107,7 @@ public class BlackJack {
         showMessageLose();
     }
 
-    private static void runInCaseOfWin(List<String> deck,
-            List<List<String>> eachHands, int coins, int round) {
+    private static int runInCaseOfWin(List<List<String>> eachHands, int coins) {
 
         if (isWinPlayer(eachHands)) {
             List<String> playerHand = getPlayerHand(eachHands);
@@ -127,6 +126,19 @@ public class BlackJack {
 
             showMessageWin();
         }
+        return coins;
+    }
+
+    private static int runInCaseOfDraw(List<List<String>> eachHands,
+            int coins) {
+
+        if (isDraw(eachHands)) {
+            coins += AMOUNT_OF_COIN_BACK_AT_DRAW;
+            showMessagePayBackAtDraw();
+            showMessageDraw();
+            showCoinAmount(coins);
+        }
+        return coins;
     }
 
     private static void showMessagePayBackAtNormalWin() {
@@ -137,17 +149,6 @@ public class BlackJack {
     private static void showMessagePayBackAtBlackJack() {
         System.out.format(MESSAGE_FOR_PAY_BACK_AT_BLACK_JACK,
                 AMOUNT_OF_COIN_BACK_AT_BLACK_JACK);
-    }
-
-    private static void runInCaseOfDraw(List<String> deck,
-            List<List<String>> eachHands, int coins, int round) {
-
-        if (isDraw(eachHands)) {
-            coins += AMOUNT_OF_COIN_BACK_AT_DRAW;
-            showMessagePayBackAtDraw();
-            showMessageDraw();
-            showCoinAmount(coins);
-        }
     }
 
     private static void showMessagePayBackAtDraw() {
