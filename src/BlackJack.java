@@ -384,6 +384,7 @@ public class BlackJack {
 
             if (!isAceCard(card)) {
                 value += FACE_CARD_VALUE;
+                continue;
             }
 
             value += calcValueIfAceCard(card, value);
