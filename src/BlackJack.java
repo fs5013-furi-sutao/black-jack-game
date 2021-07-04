@@ -234,9 +234,11 @@ public class BlackJack {
     }
 
     private static void showCoinAmount(List<Integer> coins) {
-        for (int i = 0; i < coins.size(); i++) {
-            System.out.format(MESSAGE_FOR_COIN_AMOUNT, getPlayerName(i),
-                    coins.get(i));
+        int index = 0;
+        while (!isOverMaxPlayerIndex(NUM_OF_PLAYERS, index)) {
+            System.out.format(MESSAGE_FOR_COIN_AMOUNT, getPlayerName(index),
+                    coins.get(index));
+            index++;
         }
         show(EMPTY_LINE);
     }
@@ -260,11 +262,13 @@ public class BlackJack {
     }
 
     private static void bet(List<Integer> coins) {
-        for (int i = 0; i < coins.size(); i++) {
-            int coin = coins.get(i);
+        int index = 0;
+        while (!isOverMaxPlayerIndex(NUM_OF_PLAYERS, index)) {
+            int coin = coins.get(index);
             if (coin != 0) {
-                coins.set(i, coin - AMOUNT_OF_ONE_BET);
+                coins.set(index, coin - AMOUNT_OF_ONE_BET);
             }
+            index++;
         }
     }
 
@@ -326,9 +330,11 @@ public class BlackJack {
 
     private static void oparateByPlayer(List<String> deck,
             List<List<String>> eachHands) {
-        for (int i = 0; i < NUM_OF_PLAYERS; i++) {
-            List<String> playerHand = getPlayerHand(eachHands, i);
-            actHitOrStandByPlayer(deck, playerHand, i);
+        int index = 0;
+        while (!isOverMaxPlayerIndex(NUM_OF_PLAYERS, index)) {
+            List<String> playerHand = getPlayerHand(eachHands, index);
+            actHitOrStandByPlayer(deck, playerHand, index);
+            index++;
         }
     }
 
@@ -350,7 +356,7 @@ public class BlackJack {
 
             if (!isBusted(hand) && !isBlackJack(hand)) {
                 draw(deck, hand);
-                // showDrawnCardFaceUp(DEALER_NAME, hand);
+                showDrawnCardFaceUp(DEALER_NAME, hand);
             }
             showTotalValue(DEALER_NAME, hand);
             isDealt = true;
