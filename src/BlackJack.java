@@ -93,11 +93,17 @@ public class BlackJack {
     }
 
     private static void showResults(List<List<String>> eachHands) {
-        for (int i = 0; i < NUM_OF_PLAYERS; i++) {
-            showResultInCaseOfDraw(eachHands, i);
-            showResultInCaseOfWin(eachHands, i);
-            showResultInCaseOfLose(eachHands, i);
+        int index = 0;
+        while (!isOverMaxPlayerIndex(NUM_OF_PLAYERS, index)) {
+            showResultInCaseOfDraw(eachHands, index);
+            showResultInCaseOfWin(eachHands, index);
+            showResultInCaseOfLose(eachHands, index);
+            index++;
         }
+    }
+
+    private static boolean isOverMaxPlayerIndex(int numOfPlayers, int index) {
+        return index >= NUM_OF_PLAYERS;
     }
 
     private static void showResultInCaseOfWin(List<List<String>> eachHands,
@@ -136,10 +142,12 @@ public class BlackJack {
 
     private static void computeCoins(List<List<String>> eachHands,
             List<Integer> coins) {
-        for (int i = 0; i < NUM_OF_PLAYERS; i++) {
-            computeCoinInCaseOfDraw(eachHands, i, coins);
-            computeCoinInCaseOfWin(eachHands, i, coins);
-            computeCoinInCaseOfLose(eachHands, i, coins);
+        int index = 0;
+        while (!isOverMaxPlayerIndex(NUM_OF_PLAYERS, index)) {
+            computeCoinInCaseOfDraw(eachHands, index, coins);
+            computeCoinInCaseOfWin(eachHands, index, coins);
+            computeCoinInCaseOfLose(eachHands, index, coins);
+            index++;
         }
     }
 
@@ -302,12 +310,18 @@ public class BlackJack {
         return calcValue(playerHand) > calcValue(dealerHand);
     }
 
-    private static List<List<String>> initEachHands(int members) {
+    private static List<List<String>> initEachHands(int numOfmembers) {
         List<List<String>> eachHands = new ArrayList<>();
-        for (int i = 0; i < members; i++) {
+        int index = 0;
+        while (!isOverMaxMemberIndex(numOfmembers, index)) {
             eachHands.add(new ArrayList<>());
+            index++;
         }
         return eachHands;
+    }
+
+    private static boolean isOverMaxMemberIndex(int numOfmembers, int index) {
+        return index > numOfmembers;
     }
 
     private static void oparateByPlayer(List<String> deck,
