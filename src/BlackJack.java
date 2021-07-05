@@ -59,6 +59,8 @@ public class BlackJack {
     private static final int AMOUNT_OF_COIN_BACK_AT_DRAW = 10;
     private static final int AMOUNT_OF_COIN_BACK_AT_NORMAL_WIN = 20;
     private static final int AMOUNT_OF_COIN_BACK_AT_BLACK_JACK = 30;
+    private static final String[] ACTION_CMNDS_OF_HIT = { "Y", "y" };
+    private static final String[] ACTION_CMNDS_OF_STAND = { "N", "n" };
 
     public static void main(String[] args) {
         List<Integer> coins = initCoins(NUM_OF_PLAYERS,
@@ -443,12 +445,22 @@ public class BlackJack {
         return isChooseActionHit(str) || isChooseActionStand(str);
     }
 
-    private static boolean isChooseActionStand(String str) {
-        return "N".equals(str) || "n".equals(str);
+    private static boolean isChooseActionHit(String str) {
+        for (String cmd : ACTION_CMNDS_OF_HIT) {
+            if (cmd.equals(str)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private static boolean isChooseActionHit(String str) {
-        return "Y".equals(str) || "y".equals(str);
+    private static boolean isChooseActionStand(String str) {
+        for (String cmd : ACTION_CMNDS_OF_STAND) {
+            if (cmd.equals(str)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String recieveInputtedStr() {
