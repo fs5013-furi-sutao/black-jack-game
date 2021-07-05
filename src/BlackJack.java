@@ -362,8 +362,8 @@ public class BlackJack {
             isDealt = true;
         }
 
-        runInCaseOfBusted(DEALER_NAME, hand);
-        runInCaseOfBlackJack(DEALER_NAME, hand);
+        showMessageInCaseOfBusted(DEALER_NAME, hand);
+        showMessageInCaseOfBlackJack(DEALER_NAME, hand);
 
         if (!isDealt) {
             showTotalValue(DEALER_NAME, hand);
@@ -371,16 +371,17 @@ public class BlackJack {
         show(EMPTY_LINE);
     }
 
-    private static void runInCaseOfBlackJack(String name, List<String> hand) {
+    private static void showMessageInCaseOfBlackJack(String name,
+            List<String> hand) {
         if (isBlackJack(hand)) {
             showMessageBlackJack(name);
         }
     }
 
-    private static void runInCaseOfBusted(String name, List<String> hand) {
+    private static void showMessageInCaseOfBusted(String name,
+            List<String> hand) {
         if (isBusted(hand)) {
             showMessageBusted(name);
-            ;
         }
     }
 
